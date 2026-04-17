@@ -88,8 +88,7 @@
                 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-pkb text-white" id="tabel-head-2024">
-                        </thead>
+                        <thead class="bg-pkb text-white" id="tabel-head-2024"></thead>
                         <tbody id="tabel-body-2024" class="bg-white divide-y divide-gray-200">
                             <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Menunggu Sinkronisasi Data...</td></tr>
                         </tbody>
@@ -125,18 +124,15 @@
     </main>
 
     <script>
-        // PERBAIKAN LOGIKA GANTI TAB & WARNA
         function bukaTab(namaTab) {
             document.getElementById('tab-2024').classList.add('hidden');
             document.getElementById('tab-2029').classList.add('hidden');
             
-            // Reset Semua Warna Tab ke Abu-abu
             document.getElementById('btn-2024').className = "px-4 py-2 font-bold text-sm md:text-base border-b-4 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap transition-all";
             document.getElementById('btn-2029').className = "px-4 py-2 font-bold text-sm md:text-base border-b-4 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap transition-all";
 
             document.getElementById(namaTab).classList.remove('hidden');
             
-            // Beri warna sesuai tab yang aktif
             if(namaTab === 'tab-2024') {
                 document.getElementById('btn-2024').classList.add('border-pkb', 'text-pkb');
                 document.getElementById('btn-2024').classList.remove('border-transparent', 'text-gray-400');
@@ -228,7 +224,6 @@
             if(level === 'KOTA') { kecPilihan = null; kelPilihan = null; }
             if(level === 'KECAMATAN') { kecPilihan = namaKec; kelPilihan = null; }
             if(level === 'KELURAHAN') { kecPilihan = namaKec; kelPilihan = namaKel; }
-            // Kosongkan form pencarian saat pindah halaman
             document.getElementById('cari-2024').value = '';
             renderTabelDrillDown();
         }
@@ -284,7 +279,7 @@
                     <span class="text-gray-400">/</span> 
                     <span class="text-pkb font-bold">${kelPilihan}</span>
                 `;
-                head.innerHTML = `<tr><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">No TPS</th><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">Suara Partai</th><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">Caleg Dominan</th><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">Total Suara</th></tr>`;
+                head.innerHTML = `<tr><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">No TPS & Lokasi</th><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">Suara Partai</th><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">Caleg Dominan</th><th class="px-2 md:px-4 py-3 text-left text-[10px] md:text-xs font-bold uppercase">Total Suara</th></tr>`;
                 
                 let dataTPS = dataAgregat[kecPilihan].kelurahan[kelPilihan].tps;
                 let arrTPS = Object.keys(dataTPS).sort((a,b) => parseInt(a) - parseInt(b));
@@ -292,10 +287,13 @@
                 arrTPS.forEach(tps => {
                     let d = dataTPS[tps];
                     let namaPemenang = d.pemenang !== "-" ? d.pemenang.replace(/_/g, '.') : "-";
-                    // PERBAIKAN UKURAN FONT SUARA CALEG
+                    // 🌟 BARU: ALAMAT TPS DITAMPILKAN DI BAWAH NOMOR TPS
                     htmlBody += `
                     <tr class="hover:bg-green-50 border-b">
-                        <td class="px-2 md:px-4 py-3"><span class="bg-gray-100 border text-gray-700 px-2 py-1 rounded font-bold text-[10px] md:text-xs whitespace-nowrap">TPS ${tps}</span></td>
+                        <td class="px-2 md:px-4 py-3">
+                            <span class="bg-gray-100 border text-gray-700 px-2 py-1 rounded font-bold text-[10px] md:text-xs whitespace-nowrap">TPS ${tps}</span>
+                            <span class="block text-[9px] md:text-[10px] text-gray-500 mt-1 leading-tight">📍 ${d.alamat || "-"}</span>
+                        </td>
                         <td class="px-2 md:px-4 py-3 text-xs md:text-sm font-bold text-yellow-600">${d.suara_partai}</td>
                         <td class="px-2 md:px-4 py-3 text-xs md:text-sm text-gray-800">
                             <b>${namaPemenang}</b><br>
@@ -308,7 +306,6 @@
             body.innerHTML = htmlBody;
         }
 
-        // FUNGSI PENCARIAN DRILL DOWN (BARU)
         function filterTabelDrillDown() {
             let input = document.getElementById("cari-2024").value.toUpperCase();
             let table = document.getElementById("tabel-body-2024");
