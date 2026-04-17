@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center LPP PKB Surabaya</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { pkb: '#03754c', pkb_light: '#049360' }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased text-gray-800">
+
+    <nav class="bg-pkb shadow-lg border-b-4 border-yellow-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-white text-xl tracking-wider">🔥 COMMAND CENTER PKB 2029</span>
+                </div>
+                <div class="text-white text-sm">
+                    Status: <span id="status-koneksi" class="font-bold text-yellow-300">Menghubungkan...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-pkb">
+                <h3 class="text-gray-500 text-sm font-bold uppercase tracking-wide">Total TPS Terdata</h3>
+                <p id="teks-total-tps" class="text-3xl font-black text-gray-800 mt-2">0</p>
+                <p class="text-xs text-gray-400 mt-1">Rekapitulasi Pemilu 2024</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-400">
+                <h3 class="text-gray-500 text-sm font-bold uppercase tracking-wide">Total Suara PKB (Dapil Terinput)</h3>
+                <p id="teks-total-suara" class="text-3xl font-black text-gray-800 mt-2">0</p>
+                <p class="text-xs text-gray-400 mt-1">Akumulasi Suara Partai & Caleg</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <h3 class="text-gray-500 text-sm font-bold uppercase tracking-wide">Pemilih Baru 2029</h3>
+                <p class="text-3xl font-black text-gray-800 mt-2">0</p>
+                <p class="text-xs text-gray-400 mt-1">Belum Terhubung ke GSheet Input</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h2 class="text-lg font-bold text-gray-800">Peta Suara Basis TPS 2024 (Preview)</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-pkb text-white">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Kecamatan</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Kelurahan</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">No TPS</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Total Suara PKB</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-body" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                                <span class="animate-pulse">⏳ Memuat jutaan data dari server...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. Kredensial Firebase LPP PKB Surabaya (Sudah diarahkan ke asia-southeast1)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQlQDmaufqIXexhdhoKOjLKHCxwOBZxbM",
+            authDomain: "pemilu-2029.firebaseapp.com",
+            databaseURL: "https://pemilu-2029-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "pemilu-2029",
+            storageBucket: "pemilu-2029.firebasestorage.app",
+            messagingSenderId: "912535390663",
+            appId: "1:912535390663:web:6f30e3762a8594e2ec31e2"
+        };
+
+        // 2. Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 3. Menarik Data dari Awan
+        const dbRef = database.ref('arsip_pemilu_2024');
+        
+        dbRef.once('value', (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('status-koneksi').innerText = "✅ Online";
+            document.getElementById('status-koneksi').classList.replace("text-yellow-300", "text-green-300");
+
+            if (data) {
+                let totalTPS = 0;
+                let grandTotalSuara = 0;
+                let htmlTabel = "";
+                
+                // Variabel pembatas agar browser tidak hang merender ribuan baris
+                let limitRender = 0; 
+
+                // 4. Memproses Data JSON menjadi Statistik & Tabel
+                for (let idTPS in data) {
+                    totalTPS++;
+                    let tpsData = data[idTPS];
+                    
+                    // Menjumlahkan seluruh suara caleg dan partai di TPS ini
+                    let suaraTPSIni = 0;
+                    for (let entitas in tpsData.perolehan_suara) {
+                        suaraTPSIni += parseInt(tpsData.perolehan_suara[entitas]) || 0;
+                    }
+                    grandTotalSuara += suaraTPSIni;
+
+                    // Buat baris tabel (Kita batasi tampil 15 baris pertama dulu sebagai preview)
+                    if (limitRender < 15) {
+                        htmlTabel += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${tpsData.KECAMATAN}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tpsData.KELURAHAN}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><span class="bg-gray-100 px-2 py-1 rounded font-bold">${tpsData.NO_TPS}</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-pkb font-bold">${suaraTPSIni} Suara</td>
+                            </tr>
+                        `;
+                        limitRender++;
+                    }
+                }
+
+                // 5. Cetak ke Layar
+                // Format angka jadi ada titiknya (Contoh: 1.500)
+                document.getElementById('teks-total-tps').innerText = new Intl.NumberFormat('id-ID').format(totalTPS);
+                document.getElementById('teks-total-suara').innerText = new Intl.NumberFormat('id-ID').format(grandTotalSuara);
+                document.getElementById('tabel-body').innerHTML = htmlTabel;
+
+            } else {
+                document.getElementById('tabel-body').innerHTML = `<tr><td colspan="4" class="text-center py-8">Belum ada data di Firebase.</td></tr>`;
+            }
+        }).catch((error) => {
+            console.error(error);
+            document.getElementById('status-koneksi').innerText = "❌ Gagal Terhubung";
+        });
+    </script>
+</body>
+</html>
