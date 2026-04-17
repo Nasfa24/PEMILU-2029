@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center LPP PKB Surabaya</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { pkb: '#03754c', pkb_light: '#049360' } } } }
+    </script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased text-gray-800">
+
+    <nav class="bg-pkb shadow-lg border-b-4 border-yellow-400 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-white text-lg md:text-xl tracking-wider">🔥 LPP PKB SURABAYA</span>
+                </div>
+                <div class="text-white text-xs md:text-sm bg-pkb_light px-3 py-1 rounded-full border border-white/20">
+                    <span id="status-koneksi" class="font-bold text-yellow-300 animate-pulse">Menghubungkan...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow p-4 border-b-4 border-pkb">
+                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Total TPS (2024)</h3>
+                <p id="teks-total-tps" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-b-4 border-yellow-400">
+                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Total Suara PKB</h3>
+                <p id="teks-total-suara" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-b-4 border-blue-500 bg-blue-50 relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10 text-6xl">📈</div>
+                <h3 class="text-blue-800 text-[10px] md:text-xs font-bold uppercase tracking-wide">Pemilih Baru 2029</h3>
+                <p id="teks-pemilih-baru" class="text-xl md:text-3xl font-black text-blue-900 mt-1 relative z-10">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-b-4 border-red-500">
+                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Target Pemilih</h3>
+                <p class="text-xl md:text-3xl font-black text-gray-800 mt-1">500.000</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-pkb relative">
+                <h2 class="text-sm md:text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">🏆 Top 5 Kecamatan (Suara PKB)</h2>
+                <div class="relative h-64">
+                    <canvas id="chartKecamatan"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-blue-500 relative">
+                <h2 class="text-sm md:text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">🎯 Progres Menuju 500.000</h2>
+                <div class="relative h-64 flex justify-center items-center">
+                    <canvas id="chartProgres"></canvas>
+                    <div id="persen-target" class="absolute font-black text-3xl text-blue-800 hidden md:block">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mb-6 border-b-2 border-gray-200 overflow-x-auto">
+            <button onclick="bukaTab('tab-2024')" id="btn-2024" class="px-4 py-2 font-bold text-sm md:text-base border-b-4 border-pkb text-pkb whitespace-nowrap transition-all">📊 Peta Suara 2024</button>
+            <button onclick="bukaTab('tab-2029')" id="btn-2029" class="px-4 py-2 font-bold text-sm md:text-base border-b-4 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap transition-all">👥 Progres Pemilih Baru</button>
+        </div>
+
+        <div id="tab-2024" class="block">
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="px-4 py-4 bg-gray-50 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-gray-800">Database Rekapitulasi TPS</h2>
+                    <input type="text" id="cari-2024" onkeyup="filterTabel2024()" placeholder="Cari Kelurahan / Kecamatan..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pkb w-64 text-sm">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-pkb text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Wilayah</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">No TPS</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Total Suara</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Suara Partai</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Caleg Dominan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-body-2024" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-2029" class="hidden">
+            <div class="bg-white rounded-lg shadow overflow-hidden border-t-4 border-blue-500">
+                <div class="px-4 py-4 bg-gray-50 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-blue-900">Database Calon Pemilih 2029</h2>
+                    <input type="text" id="cari-2029" onkeyup="filterTabel2029()" placeholder="Cari Nama / Kelurahan / Koordinator..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-sm">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-blue-600 text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Pemilih</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Wilayah</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Prediksi TPS</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Koordinator</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Status Deteksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-body-2029" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Menunggu Sinkronisasi Data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Logika Tab
+        function bukaTab(namaTab) {
+            document.getElementById('tab-2024').classList.add('hidden');
+            document.getElementById('tab-2029').classList.add('hidden');
+            document.getElementById('btn-2024').classList.replace('border-pkb', 'border-transparent');
+            document.getElementById('btn-2024').classList.replace('text-pkb', 'text-gray-400');
+            document.getElementById('btn-2029').classList.replace('border-pkb', 'border-transparent');
+            document.getElementById('btn-2029').classList.replace('text-pkb', 'text-gray-400');
+            if(namaTab === 'tab-2029') { document.getElementById('btn-2029').classList.remove('border-pkb'); }
+
+            document.getElementById(namaTab).classList.remove('hidden');
+            if(namaTab === 'tab-2024') {
+                document.getElementById('btn-2024').classList.replace('border-transparent', 'border-pkb');
+                document.getElementById('btn-2024').classList.replace('text-gray-400', 'text-pkb');
+            } else {
+                document.getElementById('btn-2029').classList.replace('border-transparent', 'border-blue-500');
+                document.getElementById('btn-2029').classList.replace('text-gray-400', 'text-blue-600');
+            }
+        }
+
+        // Kredensial Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQlQDmaufqIXexhdhoKOjLKHCxwOBZxbM",
+            authDomain: "pemilu-2029.firebaseapp.com",
+            databaseURL: "https://pemilu-2029-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "pemilu-2029",
+            storageBucket: "pemilu-2029.firebasestorage.app",
+            messagingSenderId: "912535390663",
+            appId: "1:912535390663:web:6f30e3762a8594e2ec31e2"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let dataGlobal2024 = [];
+        let dataGlobal2029 = [];
+        
+        // Memori Grafik agar bisa diupdate tanpa error
+        let myChartKecamatan = null;
+        let myChartProgres = null;
+
+        // 1. DATA REKAP 2024 & GRAFIK KECAMATAN
+        database.ref('arsip_pemilu_2024').once('value', (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('status-koneksi').innerText = "✅ REAL-TIME SYNC";
+            document.getElementById('status-koneksi').classList.replace("text-yellow-300", "text-green-300");
+            document.getElementById('status-koneksi').classList.remove("animate-pulse");
+
+            if (data) {
+                let grandTotalSuara = 0;
+                let rekapKecamatan = {}; // Untuk Grafik
+
+                for (let idTPS in data) {
+                    let d = data[idTPS];
+                    let totalSuaraTPS = 0, suaraPartaiMurni = 0, calegPemenang = "-", suaraPemenang = 0;
+                    for (let entitas in d.perolehan_suara) {
+                        let suara = parseInt(d.perolehan_suara[entitas]) || 0;
+                        totalSuaraTPS += suara;
+                        if (entitas.toUpperCase().indexOf("PARTAI") > -1) suaraPartaiMurni += suara;
+                        else if (suara > suaraPemenang) { suaraPemenang = suara; calegPemenang = entitas; }
+                    }
+                    grandTotalSuara += totalSuaraTPS;
+                    
+                    // Kumpulkan data total per kecamatan
+                    rekapKecamatan[d.KECAMATAN] = (rekapKecamatan[d.KECAMATAN] || 0) + totalSuaraTPS;
+
+                    dataGlobal2024.push({ kecamatan: d.KECAMATAN, kelurahan: d.KELURAHAN, tps: d.NO_TPS, totalSuara: totalSuaraTPS, suaraPartai: suaraPartaiMurni, pemenang: calegPemenang, suaraPemenang: suaraPemenang });
+                }
+                
+                document.getElementById('teks-total-tps').innerText = new Intl.NumberFormat('id-ID').format(dataGlobal2024.length);
+                document.getElementById('teks-total-suara').innerText = new Intl.NumberFormat('id-ID').format(grandTotalSuara);
+                renderTabel2024(dataGlobal2024.slice(0, 50));
+
+                // --- PROSES MENGGAMBAR GRAFIK BATANG ---
+                // Urutkan dari tertinggi ke terendah, ambil Top 5
+                let topKecamatan = Object.keys(rekapKecamatan).sort((a,b) => rekapKecamatan[b] - rekapKecamatan[a]).slice(0,5);
+                let nilaiKecamatan = topKecamatan.map(k => rekapKecamatan[k]);
+
+                const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
+                myChartKecamatan = new Chart(ctxKec, {
+                    type: 'bar',
+                    data: {
+                        labels: topKecamatan,
+                        datasets: [{
+                            label: 'Total Suara',
+                            data: nilaiKecamatan,
+                            backgroundColor: '#03754c', // Hijau PKB
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        });
+
+        // 2. DATA PEMILIH 2029 & GRAFIK DONAT PROGRES
+        database.ref('pemilih_baru_2029').on('value', (snapshot) => {
+            const data = snapshot.val();
+            dataGlobal2029 = [];
+            let totalPemilih = 0;
+            const targetPemilih = 500000;
+
+            if (data) {
+                for (let key in data) {
+                    totalPemilih++;
+                    dataGlobal2029.push(data[key]);
+                }
+                dataGlobal2029.reverse(); // Terbaru di atas
+                document.getElementById('teks-pemilih-baru').innerText = new Intl.NumberFormat('id-ID').format(totalPemilih);
+                renderTabel2029(dataGlobal2029.slice(0, 50));
+            }
+
+            // --- PROSES MENGGAMBAR GRAFIK DONAT (REAL-TIME) ---
+            let sisaTarget = targetPemilih - totalPemilih;
+            if (sisaTarget < 0) sisaTarget = 0; // Jika melebihi target
+
+            // Update persentase di tengah donat
+            let persentase = ((totalPemilih / targetPemilih) * 100).toFixed(2);
+            document.getElementById('persen-target').innerText = persentase + "%";
+
+            const ctxProg = document.getElementById('chartProgres').getContext('2d');
+            if(myChartProgres) {
+                myChartProgres.destroy(); // Hapus grafik lama agar bisa digambar ulang saat data bertambah
+            }
+            myChartProgres = new Chart(ctxProg, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Telah Terdata', 'Sisa Target'],
+                    datasets: [{
+                        data: [totalPemilih, sisaTarget],
+                        backgroundColor: ['#3b82f6', '#e5e7eb'], // Biru untuk tercapai, Abu untuk sisa
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { maintainAspectRatio: false, cutout: '75%' }
+            });
+        });
+
+        // Render Tabel (Sama seperti sebelumnya)
+        function renderTabel2024(arrayData) {
+            let html = "";
+            arrayData.forEach(d => {
+                html += `<tr class="hover:bg-green-50 border-b"><td class="px-4 py-3 text-sm"><b>${d.kelurahan}</b><br><span class="text-gray-500">${d.kecamatan}</span></td><td class="px-4 py-3 text-sm"><span class="bg-gray-100 border px-2 py-1 rounded font-bold">TPS ${d.tps}</span></td><td class="px-4 py-3 text-sm text-pkb font-black">${d.totalSuara}</td><td class="px-4 py-3 text-sm text-yellow-600 font-bold">${d.suaraPartai}</td><td class="px-4 py-3 text-sm text-gray-700"><b>${d.pemenang.replace(/_/g, '.')}</b> <br><span class="text-[10px] text-gray-500">(${d.suaraPemenang} Suara)</span></td></tr>`;
+            });
+            document.getElementById('tabel-body-2024').innerHTML = html;
+        }
+
+        function renderTabel2029(arrayData) {
+            let html = "";
+            arrayData.forEach(d => {
+                let isWarning = d.status.indexOf("⚠️") > -1;
+                let rowColor = isWarning ? "bg-yellow-50" : "hover:bg-blue-50";
+                let statusBadge = isWarning ? `<span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded font-bold">${d.status}</span>` : `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">${d.status}</span>`;
+                html += `<tr class="${rowColor} border-b transition-colors"><td class="px-4 py-3 text-sm"><b>${d.nama}</b><br><span class="text-xs text-gray-500">NIK: ${d.nik}</span></td><td class="px-4 py-3 text-sm"><b>${d.kelurahan}</b><br><span class="text-xs text-gray-500">RT ${d.rt} / RW ${d.rw}</span></td><td class="px-4 py-3 text-sm font-bold text-blue-700">${d.prediksi_tps}</td><td class="px-4 py-3 text-sm text-gray-700">${d.koordinator}</td><td class="px-4 py-3 text-sm">${statusBadge}</td></tr>`;
+            });
+            document.getElementById('tabel-body-2029').innerHTML = html;
+        }
+
+        function filterTabel2024() { let k = document.getElementById('cari-2024').value.toUpperCase(); renderTabel2024(k === "" ? dataGlobal2024.slice(0, 50) : dataGlobal2024.filter(d => d.kelurahan.includes(k) || d.kecamatan.includes(k) || ("TPS "+d.tps).includes(k)).slice(0, 50)); }
+        function filterTabel2029() { let k = document.getElementById('cari-2029').value.toUpperCase(); renderTabel2029(k === "" ? dataGlobal2029.slice(0, 50) : dataGlobal2029.filter(d => d.nama.toUpperCase().includes(k) || d.kelurahan.toUpperCase().includes(k) || d.koordinator.toUpperCase().includes(k)).slice(0, 50)); }
+    </script>
+</body>
+</html>
