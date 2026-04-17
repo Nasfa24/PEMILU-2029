@@ -34,10 +34,10 @@
                 <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Data TPS Terinput</h3>
                 <p class="text-xl md:text-3xl font-black text-gray-800 mt-1">
                     <span id="teks-total-tps">0</span>
-                    <span class="text-xs md:text-sm text-gray-400 font-bold">/ 8.167</span>
+                    <span class="text-xs md:text-sm text-gray-400 font-bold" id="target-tps-master">/ 0</span>
                 </p>
                 <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                    <div id="bar-tps" class="bg-pkb h-1.5 rounded-full" style="width: 0%"></div>
+                    <div id="bar-tps" class="bg-pkb h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
             
@@ -79,22 +79,19 @@
 
         <div id="tab-2024" class="block">
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="px-4 py-4 bg-gray-50 border-b flex justify-between items-center">
-                    <h2 class="text-lg font-bold text-gray-800">Database Rekapitulasi TPS</h2>
-                    <input type="text" id="cari-2024" onkeyup="filterTabel2024()" placeholder="Cari Kelurahan / Kecamatan..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pkb w-64 text-sm">
+                <div class="px-4 py-4 bg-gray-50 border-b flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div id="breadcrumb" class="font-bold text-sm text-gray-700 flex items-center space-x-2">
+                        <span class="cursor-pointer text-pkb hover:underline" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span>
+                    </div>
                 </div>
+                
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-pkb text-white">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Wilayah</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">No TPS</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Total Suara</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Suara Partai</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Caleg Dominan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabel-body-2024" class="bg-white divide-y divide-gray-200"></tbody>
+                        <thead class="bg-pkb text-white" id="tabel-head-2024">
+                            </thead>
+                        <tbody id="tabel-body-2024" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Menunggu Sinkronisasi Data...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -103,8 +100,8 @@
         <div id="tab-2029" class="hidden">
             <div class="bg-white rounded-lg shadow overflow-hidden border-t-4 border-blue-500">
                 <div class="px-4 py-4 bg-gray-50 border-b flex justify-between items-center">
-                    <h2 class="text-lg font-bold text-blue-900">Database Calon Pemilih 2029</h2>
-                    <input type="text" id="cari-2029" onkeyup="filterTabel2029()" placeholder="Cari Nama / Kelurahan / Koordinator..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-sm">
+                    <h2 class="text-lg font-bold text-blue-900">Database Calon Pemilih</h2>
+                    <input type="text" id="cari-2029" onkeyup="filterTabel2029()" placeholder="Cari Nama / Kelurahan..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64 text-sm">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -114,7 +111,7 @@
                                 <th class="px-4 py-3 text-left text-xs font-bold uppercase">Wilayah</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold uppercase">Prediksi TPS</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold uppercase">Koordinator</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Status Deteksi</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-body-2029" class="bg-white divide-y divide-gray-200">
@@ -127,6 +124,7 @@
     </main>
 
     <script>
+        // Tab Navigasi Dasar
         function bukaTab(namaTab) {
             document.getElementById('tab-2024').classList.add('hidden');
             document.getElementById('tab-2029').classList.add('hidden');
@@ -134,7 +132,7 @@
             document.getElementById('btn-2024').classList.replace('text-pkb', 'text-gray-400');
             document.getElementById('btn-2029').classList.replace('border-pkb', 'border-transparent');
             document.getElementById('btn-2029').classList.replace('text-pkb', 'text-gray-400');
-            if(namaTab === 'tab-2029') { document.getElementById('btn-2029').classList.remove('border-pkb'); }
+            if(namaTab === 'tab-2029') document.getElementById('btn-2029').classList.remove('border-pkb');
 
             document.getElementById(namaTab).classList.remove('hidden');
             if(namaTab === 'tab-2024') {
@@ -146,6 +144,7 @@
             }
         }
 
+        // KREDENSIAL FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDQlQDmaufqIXexhdhoKOjLKHCxwOBZxbM",
             authDomain: "pemilu-2029.firebaseapp.com",
@@ -158,52 +157,69 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let dataGlobal2024 = [];
+        // Variabel Global
+        let dataAgregat = null; // Menyimpan seluruh data Drill-Down
+        let targetTPSMaster = 0;
         let dataGlobal2029 = [];
         let myChartKecamatan = null;
         let myChartProgres = null;
 
-        // DATA 2024 & GRAFIK
-        database.ref('arsip_pemilu_2024').once('value', (snapshot) => {
-            const data = snapshot.val();
-            document.getElementById('status-koneksi').innerText = "✅ REAL-TIME SYNC";
+        // State Drill-Down
+        let levelSaatIni = 'KOTA'; // KOTA -> KECAMATAN -> KELURAHAN
+        let kecPilihan = null;
+        let kelPilihan = null;
+
+        // 1. MENDENGARKAN METADATA TOTAL TPS (.on = Auto Refresh)
+        database.ref('metadata/total_tps').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (val) targetTPSMaster = val;
+        });
+
+        // 2. MENDENGARKAN DATA AGREGAT DRILL-DOWN 2024 (.on = Auto Refresh)
+        database.ref('agregat_wilayah_2024').on('value', (snapshot) => {
+            dataAgregat = snapshot.val();
+            
+            document.getElementById('status-koneksi').innerText = "✅ ONLINE REAL-TIME";
             document.getElementById('status-koneksi').classList.replace("text-yellow-300", "text-green-300");
             document.getElementById('status-koneksi').classList.remove("animate-pulse");
 
-            if (data) {
+            if (dataAgregat) {
+                // Hitung Grand Total dari Data Agregat
                 let grandTotalSuara = 0;
+                let totalTPSMasuk = 0;
                 let rekapKecamatan = {};
 
-                for (let idTPS in data) {
-                    let d = data[idTPS];
-                    let totalSuaraTPS = 0, suaraPartaiMurni = 0, calegPemenang = "-", suaraPemenang = 0;
-                    for (let entitas in d.perolehan_suara) {
-                        let suara = parseInt(d.perolehan_suara[entitas]) || 0;
-                        totalSuaraTPS += suara;
-                        if (entitas.toUpperCase().indexOf("PARTAI") > -1) suaraPartaiMurni += suara;
-                        else if (suara > suaraPemenang) { suaraPemenang = suara; calegPemenang = entitas; }
+                for (let kec in dataAgregat) {
+                    let suaraKec = dataAgregat[kec].total_suara;
+                    grandTotalSuara += suaraKec;
+                    rekapKecamatan[kec] = suaraKec;
+                    
+                    // Hitung jumlah TPS masuk
+                    for (let kel in dataAgregat[kec].kelurahan) {
+                        totalTPSMasuk += Object.keys(dataAgregat[kec].kelurahan[kel].tps).length;
                     }
-                    grandTotalSuara += totalSuaraTPS;
-                    rekapKecamatan[d.KECAMATAN] = (rekapKecamatan[d.KECAMATAN] || 0) + totalSuaraTPS;
-
-                    dataGlobal2024.push({ kecamatan: d.KECAMATAN, kelurahan: d.KELURAHAN, tps: d.NO_TPS, totalSuara: totalSuaraTPS, suaraPartai: suaraPartaiMurni, pemenang: calegPemenang, suaraPemenang: suaraPemenang });
                 }
-                
-                // --- UPDATE PROGRESS BAR TPS ---
-                let totalTPSMasuk = dataGlobal2024.length;
-                let targetTPSMaster = 8167;
-                let persentaseTPS = (totalTPSMasuk / targetTPSMaster) * 100;
-                
-                document.getElementById('teks-total-tps').innerText = new Intl.NumberFormat('id-ID').format(totalTPSMasuk);
-                document.getElementById('bar-tps').style.width = persentaseTPS + '%';
-                
-                document.getElementById('teks-total-suara').innerText = new Intl.NumberFormat('id-ID').format(grandTotalSuara);
-                renderTabel2024(dataGlobal2024.slice(0, 50));
 
+                // Update Widget Angka
+                document.getElementById('teks-total-suara').innerText = new Intl.NumberFormat('id-ID').format(grandTotalSuara);
+                document.getElementById('teks-total-tps').innerText = new Intl.NumberFormat('id-ID').format(totalTPSMasuk);
+                
+                if (targetTPSMaster > 0) {
+                    document.getElementById('target-tps-master').innerText = "/ " + new Intl.NumberFormat('id-ID').format(targetTPSMaster);
+                    let persentaseTPS = (totalTPSMasuk / targetTPSMaster) * 100;
+                    if(persentaseTPS > 100) persentaseTPS = 100;
+                    document.getElementById('bar-tps').style.width = persentaseTPS + '%';
+                }
+
+                // Render Ulang Tabel sesuai Level Saat Ini
+                renderTabelDrillDown();
+
+                // Update Grafik Bar (Kecamatan)
                 let topKecamatan = Object.keys(rekapKecamatan).sort((a,b) => rekapKecamatan[b] - rekapKecamatan[a]).slice(0,5);
                 let nilaiKecamatan = topKecamatan.map(k => rekapKecamatan[k]);
 
                 const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
+                if(myChartKecamatan) myChartKecamatan.destroy();
                 myChartKecamatan = new Chart(ctxKec, {
                     type: 'bar',
                     data: {
@@ -215,7 +231,89 @@
             }
         });
 
-        // DATA PEMILIH 2029 & GRAFIK
+        // --- SISTEM DRILL-DOWN ---
+        function navigasi(level, namaKec = null, namaKel = null) {
+            levelSaatIni = level;
+            if(level === 'KOTA') { kecPilihan = null; kelPilihan = null; }
+            if(level === 'KECAMATAN') { kecPilihan = namaKec; kelPilihan = null; }
+            if(level === 'KELURAHAN') { kecPilihan = namaKec; kelPilihan = namaKel; }
+            renderTabelDrillDown();
+        }
+
+        function renderTabelDrillDown() {
+            if(!dataAgregat) return;
+            
+            const head = document.getElementById('tabel-head-2024');
+            const body = document.getElementById('tabel-body-2024');
+            const breadcrumb = document.getElementById('breadcrumb');
+            let htmlBody = "";
+
+            if (levelSaatIni === 'KOTA') {
+                breadcrumb.innerHTML = `<span class="cursor-pointer text-pkb hover:underline" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span>`;
+                head.innerHTML = `<tr><th class="px-4 py-3 text-left text-xs font-bold uppercase">Nama Kecamatan</th><th class="px-4 py-3 text-left text-xs font-bold uppercase">Total Suara PKB</th><th class="px-4 py-3 text-right text-xs font-bold uppercase">Aksi</th></tr>`;
+                
+                // Sort Kecamatan by Suara
+                let arrKec = Object.keys(dataAgregat).sort((a,b) => dataAgregat[b].total_suara - dataAgregat[a].total_suara);
+                
+                arrKec.forEach(kec => {
+                    htmlBody += `
+                    <tr class="hover:bg-green-50 border-b">
+                        <td class="px-4 py-4 text-sm font-bold text-gray-800">${kec}</td>
+                        <td class="px-4 py-4 text-sm font-black text-pkb">${new Intl.NumberFormat('id-ID').format(dataAgregat[kec].total_suara)}</td>
+                        <td class="px-4 py-4 text-right"><button onclick="navigasi('KECAMATAN', '${kec}')" class="bg-gray-100 hover:bg-pkb hover:text-white text-gray-700 px-3 py-1 rounded text-xs font-bold transition-colors">Lihat Kelurahan ➡️</button></td>
+                    </tr>`;
+                });
+            } 
+            else if (levelSaatIni === 'KECAMATAN') {
+                breadcrumb.innerHTML = `
+                    <span class="cursor-pointer text-gray-400 hover:text-pkb" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span> 
+                    <span class="text-gray-400">/</span> 
+                    <span class="cursor-pointer text-pkb font-bold hover:underline" onclick="navigasi('KECAMATAN', '${kecPilihan}')">${kecPilihan}</span>
+                `;
+                head.innerHTML = `<tr><th class="px-4 py-3 text-left text-xs font-bold uppercase">Nama Kelurahan</th><th class="px-4 py-3 text-left text-xs font-bold uppercase">Total Suara PKB</th><th class="px-4 py-3 text-right text-xs font-bold uppercase">Aksi</th></tr>`;
+                
+                let dataKelurahan = dataAgregat[kecPilihan].kelurahan;
+                let arrKel = Object.keys(dataKelurahan).sort((a,b) => dataKelurahan[b].total_suara - dataKelurahan[a].total_suara);
+
+                arrKel.forEach(kel => {
+                    htmlBody += `
+                    <tr class="hover:bg-green-50 border-b">
+                        <td class="px-4 py-4 text-sm font-bold text-gray-800">${kel}</td>
+                        <td class="px-4 py-4 text-sm font-black text-pkb">${new Intl.NumberFormat('id-ID').format(dataKelurahan[kel].total_suara)}</td>
+                        <td class="px-4 py-4 text-right"><button onclick="navigasi('KELURAHAN', '${kecPilihan}', '${kel}')" class="bg-gray-100 hover:bg-pkb hover:text-white text-gray-700 px-3 py-1 rounded text-xs font-bold transition-colors">Lihat Detail TPS ➡️</button></td>
+                    </tr>`;
+                });
+            }
+            else if (levelSaatIni === 'KELURAHAN') {
+                breadcrumb.innerHTML = `
+                    <span class="cursor-pointer text-gray-400 hover:text-pkb" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span> 
+                    <span class="text-gray-400">/</span> 
+                    <span class="cursor-pointer text-gray-400 hover:text-pkb" onclick="navigasi('KECAMATAN', '${kecPilihan}')">${kecPilihan}</span>
+                    <span class="text-gray-400">/</span> 
+                    <span class="text-pkb font-bold">${kelPilihan}</span>
+                `;
+                head.innerHTML = `<tr><th class="px-4 py-3 text-left text-xs font-bold uppercase">No TPS</th><th class="px-4 py-3 text-left text-xs font-bold uppercase">Suara Partai</th><th class="px-4 py-3 text-left text-xs font-bold uppercase">Caleg Dominan</th><th class="px-4 py-3 text-left text-xs font-bold uppercase">Total Suara PKB</th></tr>`;
+                
+                let dataTPS = dataAgregat[kecPilihan].kelurahan[kelPilihan].tps;
+                // Urutkan berdasarkan Nomor TPS (Numerik)
+                let arrTPS = Object.keys(dataTPS).sort((a,b) => parseInt(a) - parseInt(b));
+
+                arrTPS.forEach(tps => {
+                    let d = dataTPS[tps];
+                    let namaPemenang = d.pemenang !== "-" ? d.pemenang.replace(/_/g, '.') : "-";
+                    htmlBody += `
+                    <tr class="hover:bg-green-50 border-b">
+                        <td class="px-4 py-3"><span class="bg-gray-100 border text-gray-700 px-2 py-1 rounded font-bold text-xs">TPS ${tps}</span></td>
+                        <td class="px-4 py-3 text-sm font-bold text-yellow-600">${d.suara_partai}</td>
+                        <td class="px-4 py-3 text-sm text-gray-800"><b>${namaPemenang}</b><br><span class="text-[10px] text-gray-500">(${d.max_suara} Suara)</span></td>
+                        <td class="px-4 py-3 text-sm font-black text-pkb">${d.total_suara}</td>
+                    </tr>`;
+                });
+            }
+            body.innerHTML = htmlBody;
+        }
+
+        // 3. DATA PEMILIH 2029 & GRAFIK DONAT
         database.ref('pemilih_baru_2029').on('value', (snapshot) => {
             const data = snapshot.val();
             dataGlobal2029 = [];
@@ -245,25 +343,21 @@
             });
         });
 
-        function renderTabel2024(arrayData) {
-            let html = "";
-            arrayData.forEach(d => { html += `<tr class="hover:bg-green-50 border-b"><td class="px-4 py-3 text-sm"><b>${d.kelurahan}</b><br><span class="text-gray-500">${d.kecamatan}</span></td><td class="px-4 py-3 text-sm"><span class="bg-gray-100 border px-2 py-1 rounded font-bold">TPS ${d.tps}</span></td><td class="px-4 py-3 text-sm text-pkb font-black">${d.totalSuara}</td><td class="px-4 py-3 text-sm text-yellow-600 font-bold">${d.suaraPartai}</td><td class="px-4 py-3 text-sm text-gray-700"><b>${d.pemenang.replace(/_/g, '.')}</b> <br><span class="text-[10px] text-gray-500">(${d.suaraPemenang} Suara)</span></td></tr>`; });
-            document.getElementById('tabel-body-2024').innerHTML = html;
-        }
-
         function renderTabel2029(arrayData) {
             let html = "";
             arrayData.forEach(d => {
                 let isWarning = d.status.indexOf("⚠️") > -1;
                 let rowColor = isWarning ? "bg-yellow-50" : "hover:bg-blue-50";
-                let statusBadge = isWarning ? `<span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded font-bold">${d.status}</span>` : `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">${d.status}</span>`;
-                html += `<tr class="${rowColor} border-b transition-colors"><td class="px-4 py-3 text-sm"><b>${d.nama}</b><br><span class="text-xs text-gray-500">NIK: ${d.nik}</span></td><td class="px-4 py-3 text-sm"><b>${d.kelurahan}</b><br><span class="text-xs text-gray-500">RT ${d.rt} / RW ${d.rw}</span></td><td class="px-4 py-3 text-sm font-bold text-blue-700">${d.prediksi_tps}</td><td class="px-4 py-3 text-sm text-gray-700">${d.koordinator}</td><td class="px-4 py-3 text-sm">${statusBadge}</td></tr>`;
+                let statusBadge = isWarning ? `<span class="bg-yellow-200 text-yellow-800 text-[10px] px-2 py-1 rounded font-bold">${d.status}</span>` : `<span class="bg-green-100 text-green-800 text-[10px] px-2 py-1 rounded font-bold">${d.status}</span>`;
+                html += `<tr class="${rowColor} border-b transition-colors"><td class="px-4 py-3 text-sm"><b>${d.nama}</b><br><span class="text-xs text-gray-500">NIK: ${d.nik}</span></td><td class="px-4 py-3 text-sm"><b>${d.kelurahan}</b><br><span class="text-xs text-gray-500">RT ${d.rt} / RW ${d.rw}</span></td><td class="px-4 py-3 text-sm font-bold text-blue-700">${d.prediksi_tps}</td><td class="px-4 py-3 text-sm text-gray-700">${d.koordinator}</td><td class="px-4 py-3">${statusBadge}</td></tr>`;
             });
             document.getElementById('tabel-body-2029').innerHTML = html;
         }
 
-        function filterTabel2024() { let k = document.getElementById('cari-2024').value.toUpperCase(); renderTabel2024(k === "" ? dataGlobal2024.slice(0, 50) : dataGlobal2024.filter(d => d.kelurahan.includes(k) || d.kecamatan.includes(k) || ("TPS "+d.tps).includes(k)).slice(0, 50)); }
-        function filterTabel2029() { let k = document.getElementById('cari-2029').value.toUpperCase(); renderTabel2029(k === "" ? dataGlobal2029.slice(0, 50) : dataGlobal2029.filter(d => d.nama.toUpperCase().includes(k) || d.kelurahan.toUpperCase().includes(k) || d.koordinator.toUpperCase().includes(k)).slice(0, 50)); }
+        function filterTabel2029() { 
+            let k = document.getElementById('cari-2029').value.toUpperCase(); 
+            renderTabel2029(k === "" ? dataGlobal2029.slice(0, 50) : dataGlobal2029.filter(d => d.nama.toUpperCase().includes(k) || d.kelurahan.toUpperCase().includes(k)).slice(0, 50)); 
+        }
     </script>
 </body>
 </html>
