@@ -223,7 +223,7 @@
 
             if (levelSaatIni === 'KOTA') {
                 breadcrumb.innerHTML = `<span class="cursor-pointer hover:underline" onclick="navigasi('KOTA')">📍 SURABAYA (KOTA)</span>`;
-                head.innerHTML = `<tr><th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Wilayah Kecamatan</th><th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">SUARA PKB 2024 vs Progres '29</th><th class="px-4 py-4 text-right text-xs font-bold uppercase tracking-wider">Opsi</th></tr>`;
+                head.innerHTML = `<tr><th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Wilayah Kecamatan</th><th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">SUARA PKB 2024 vs PEMILIH BARU</th><th class="px-4 py-4 text-right text-xs font-bold uppercase tracking-wider">Opsi</th></tr>`;
                 
                 let arrKec = Object.keys(dataAgregat).sort((a,b) => dataAgregat[b].total_suara - dataAgregat[a].total_suara);
                 arrKec.forEach(kec => {
@@ -249,7 +249,7 @@
             } 
             else if (levelSaatIni === 'KECAMATAN') {
                 breadcrumb.innerHTML = `<span class="opacity-50 cursor-pointer" onclick="navigasi('KOTA')">SURABAYA</span> <span class="mx-1">/</span> <span class="font-black uppercase">${kecPilihan}</span>`;
-                head.innerHTML = `<tr><th class="px-4 py-4 text-left text-xs font-bold uppercase text-white">Kelurahan</th><th class="px-4 py-4 text-left text-xs font-bold uppercase text-white">SUARA PKB 2024 vs Progres '29</th><th class="px-4 py-4 text-right text-xs font-bold uppercase text-white">Opsi</th></tr>`;
+                head.innerHTML = `<tr><th class="px-4 py-4 text-left text-xs font-bold uppercase text-white">Kelurahan</th><th class="px-4 py-4 text-left text-xs font-bold uppercase text-white">SUARA PKB 2024 vs PEMILIH BARU</th><th class="px-4 py-4 text-right text-xs font-bold uppercase text-white">Opsi</th></tr>`;
                 
                 let dataKel = dataAgregat[kecPilihan].kelurahan;
                 Object.keys(dataKel).sort((a,b)=>dataKel[b].total_suara - dataKel[a].total_suara).forEach(kel => {
