@@ -8,19 +8,22 @@
     <script>
         tailwind.config = { theme: { extend: { colors: { pkb: '#03754c', pkb_light: '#049360' } } } }
     </script>
+    <style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 font-sans antialiased text-gray-800">
-
-    <nav class="bg-pkb shadow-lg border-b-4 border-yellow-400 sticky top-0 z-50">
+<body class="bg-gray-200 font-sans antialiased text-gray-900">
+    <nav class="bg-pkb shadow-xl border-b-4 border-yellow-400 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <span class="font-bold text-white text-lg md:text-xl tracking-wider">🔥 LPP PKB SURABAYA</span>
+                    <span class="font-black text-white text-lg md:text-2xl tracking-tight">🔥 LPP PKB SURABAYA</span>
                 </div>
-                <div class="text-white text-[10px] md:text-sm bg-pkb_light px-2 py-1 md:px-3 md:py-1 rounded-full border border-white/20">
+                <div class="text-white text-[10px] md:text-sm bg-black/20 px-2 py-1 md:px-3 md:py-1 rounded-lg border border-white/20 shadow-inner">
                     <span id="status-koneksi" class="font-bold text-yellow-300 animate-pulse">Menghubungkan...</span>
                 </div>
             </div>
@@ -29,94 +32,94 @@
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
         
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-            <div class="bg-white rounded-xl shadow-sm p-4 border-b-4 border-pkb">
-                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Data TPS Terinput</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-pkb">
+                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">Data TPS Terinput</h3>
                 <p class="text-xl md:text-3xl font-black text-gray-800 mt-1">
                     <span id="teks-total-tps">0</span>
                     <span class="text-xs md:text-sm text-gray-400 font-bold" id="target-tps-master">/ 0</span>
                 </p>
-                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                    <div id="bar-tps" class="bg-pkb h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div id="bar-tps" class="bg-pkb h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-sm p-4 border-b-4 border-yellow-400">
-                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Total Suara PKB</h3>
+            <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-yellow-400">
+                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">Total Suara PKB 2024</h3>
                 <p id="teks-total-suara" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
             </div>
             
-            <div class="bg-white rounded-xl shadow-sm p-4 border-b-4 border-blue-500 bg-blue-50 relative overflow-hidden">
-                <div class="absolute right-0 top-0 opacity-10 text-5xl md:text-6xl">📈</div>
-                <h3 class="text-blue-800 text-[10px] md:text-xs font-bold uppercase tracking-wide">Pemilih Baru 2029</h3>
+            <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-blue-500 relative overflow-hidden">
+                <div class="absolute right-[-10px] top-0 opacity-10 text-6xl">📈</div>
+                <h3 class="text-blue-600 text-[10px] md:text-xs font-bold uppercase">Progres Rekrutmen</h3>
                 <p id="teks-pemilih-baru" class="text-xl md:text-3xl font-black text-blue-900 mt-1 relative z-10">0</p>
             </div>
             
-            <div class="bg-white rounded-xl shadow-sm p-4 border-b-4 border-red-500">
-                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-wide">Target Pemilih</h3>
+            <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-red-500">
+                <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">Target 2029</h3>
                 <p class="text-xl md:text-3xl font-black text-gray-800 mt-1">500.000</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-sm p-4 md:p-6 border-t-4 border-pkb relative">
-                <h2 class="text-sm md:text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">🏆 Top 5 Kecamatan (Suara)</h2>
+            <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 md:p-6 relative">
+                <h2 class="text-sm font-black text-gray-800 mb-4 uppercase flex items-center"><span class="w-2 h-4 bg-pkb mr-2 rounded-sm"></span>Top 5 Kecamatan (SUARA PKB 2024)</h2>
                 <div class="relative h-48 md:h-64"><canvas id="chartKecamatan"></canvas></div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm p-4 md:p-6 border-t-4 border-blue-500 relative">
-                <h2 class="text-sm md:text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">🎯 Progres Menuju 500.000</h2>
+            <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 md:p-6 relative">
+                <h2 class="text-sm font-black text-gray-800 mb-4 uppercase flex items-center"><span class="w-2 h-4 bg-blue-500 mr-2 rounded-sm"></span>Progres Rekrutmen Baru</h2>
                 <div class="relative h-48 md:h-64 flex justify-center items-center">
                     <canvas id="chartProgres"></canvas>
-                    <div id="persen-target" class="absolute font-black text-2xl md:text-3xl text-blue-800 hidden md:block">0%</div>
+                    <div id="persen-target" class="absolute font-black text-2xl text-blue-800 hidden md:block">0%</div>
                 </div>
             </div>
         </div>
 
-        <div class="flex space-x-2 mb-4 border-b-2 border-gray-200 overflow-x-auto scrollbar-hide px-1">
-            <button onclick="bukaTab('tab-2024')" id="btn-2024" class="px-4 py-3 font-bold text-sm md:text-base border-b-4 border-pkb text-pkb whitespace-nowrap transition-all">📊 Peta Suara 2024</button>
-            <button onclick="bukaTab('tab-2029')" id="btn-2029" class="px-4 py-3 font-bold text-sm md:text-base border-b-4 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap transition-all">👥 Pemilih Baru 2029</button>
+        <div class="flex space-x-2 mb-4 bg-white p-1 rounded-xl shadow-md border border-gray-300 overflow-x-auto scrollbar-hide">
+            <button onclick="bukaTab('tab-2024')" id="btn-2024" class="flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 bg-pkb text-white shadow-md">📊 PETA KEKUATAN & PROGRES</button>
+            <button onclick="bukaTab('tab-2029')" id="btn-2029" class="flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 text-gray-500 hover:bg-gray-100">👥 DATA PEMILIH BARU</button>
         </div>
 
-        <div id="tab-2024" class="block">
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="p-4 bg-gray-50 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-                    <div id="breadcrumb" class="font-bold text-xs md:text-sm text-gray-700 flex items-center space-x-2 flex-wrap">
-                        <span class="cursor-pointer text-pkb hover:underline" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span>
+        <div id="tab-2024" class="block animate-in fade-in duration-500">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-300 overflow-hidden">
+                <div class="p-4 bg-gray-100 border-b border-gray-300 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                    <div id="breadcrumb" class="font-black text-xs md:text-sm text-pkb flex items-center space-x-2 flex-wrap bg-white px-3 py-2 rounded-lg border border-gray-300 shadow-sm">
+                        <span class="cursor-pointer hover:underline" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span>
                     </div>
-                    <input type="text" id="cari-2024" onkeyup="filterTabelDrillDown()" placeholder="Cari wilayah/data..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pkb w-full md:w-64 text-sm bg-white shadow-sm">
+                    <input type="text" id="cari-2024" onkeyup="filterTabelDrillDown()" placeholder="Cari wilayah/data..." class="px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pkb w-full md:w-64 text-sm font-bold shadow-inner">
                 </div>
                 
-                <div class="p-2 md:p-0">
+                <div class="p-3 md:p-0 bg-gray-50 md:bg-white">
                     <table class="w-full block md:table">
                         <thead class="bg-pkb text-white hidden md:table-header-group" id="tabel-head-2024"></thead>
-                        <tbody id="tabel-body-2024" class="block md:table-row-group">
-                            <tr class="block md:table-row"><td colspan="5" class="p-10 text-center text-gray-500 font-medium block md:table-cell">Menunggu Sinkronisasi Data...</td></tr>
+                        <tbody id="tabel-body-2024" class="block md:table-row-group space-y-4 md:space-y-0">
+                            <tr class="block md:table-row"><td colspan="5" class="p-10 text-center text-gray-500 font-bold block md:table-cell">Menunggu Sinkronisasi Data...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div id="tab-2029" class="hidden">
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden border-t-4 border-blue-500">
-                <div class="p-4 bg-blue-50/50 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-3">
-                    <h2 class="text-sm md:text-lg font-bold text-blue-900 w-full md:w-auto">Database Calon Pemilih</h2>
-                    <input type="text" id="cari-2029" onkeyup="filterTabel2029()" placeholder="Cari Nama / Wilayah..." class="px-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64 text-sm bg-white shadow-sm">
+        <div id="tab-2029" class="hidden animate-in fade-in duration-500">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-300 overflow-hidden">
+                <div class="p-4 bg-blue-100 border-b border-blue-300 flex flex-col md:flex-row justify-between items-center gap-3">
+                    <h2 class="text-sm md:text-lg font-black text-blue-900 w-full md:w-auto uppercase tracking-wide">DATABASE PEMILIH</h2>
+                    <input type="text" id="cari-2029" onkeyup="filterTabel2029()" placeholder="Cari Nama / Wilayah..." class="px-4 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600 w-full md:w-64 text-sm font-bold shadow-inner bg-white">
                 </div>
                 
-                <div class="p-2 md:p-0">
+                <div class="p-3 md:p-0 bg-gray-50 md:bg-white">
                     <table class="w-full block md:table">
-                        <thead class="bg-blue-600 text-white hidden md:table-header-group">
+                        <thead class="bg-blue-700 text-white hidden md:table-header-group">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Pemilih</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Wilayah</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Prediksi TPS & Lokasi</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Koordinator</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-4 text-left text-xs font-black uppercase tracking-wider">Pemilih</th>
+                                <th class="px-4 py-4 text-left text-xs font-black uppercase tracking-wider">Wilayah</th>
+                                <th class="px-4 py-4 text-left text-xs font-black uppercase tracking-wider">Prediksi TPS</th>
+                                <th class="px-4 py-4 text-left text-xs font-black uppercase tracking-wider">Koordinator</th>
+                                <th class="px-4 py-4 text-left text-xs font-black uppercase tracking-wider">Status Audit</th>
                             </tr>
                         </thead>
-                        <tbody id="tabel-body-2029" class="block md:table-row-group">
-                            <tr class="block md:table-row"><td colspan="5" class="p-10 text-center text-gray-500 font-medium block md:table-cell">Menunggu Sinkronisasi Data...</td></tr>
+                        <tbody id="tabel-body-2029" class="block md:table-row-group space-y-4 md:space-y-0">
+                            <tr class="block md:table-row"><td colspan="5" class="p-10 text-center text-gray-500 font-bold block md:table-cell">Menunggu Sinkronisasi Data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -126,21 +129,20 @@
 
     <script>
         function bukaTab(namaTab) {
-            document.getElementById('tab-2024').classList.add('hidden');
-            document.getElementById('tab-2029').classList.add('hidden');
+            const tabs = ['tab-2024', 'tab-2029'];
+            const buttons = ['btn-2024', 'btn-2029'];
             
-            document.getElementById('btn-2024').className = "px-4 py-3 font-bold text-sm md:text-base border-b-4 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap transition-all";
-            document.getElementById('btn-2029').className = "px-4 py-3 font-bold text-sm md:text-base border-b-4 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap transition-all";
-
+            tabs.forEach(t => document.getElementById(t).classList.add('hidden'));
             document.getElementById(namaTab).classList.remove('hidden');
-            
-            if(namaTab === 'tab-2024') {
-                document.getElementById('btn-2024').classList.add('border-pkb', 'text-pkb');
-                document.getElementById('btn-2024').classList.remove('border-transparent', 'text-gray-400');
-            } else {
-                document.getElementById('btn-2029').classList.add('border-blue-500', 'text-blue-600');
-                document.getElementById('btn-2029').classList.remove('border-transparent', 'text-gray-400');
-            }
+
+            buttons.forEach(b => {
+                const btn = document.getElementById(b);
+                if(b.includes(namaTab.split('-')[1])) {
+                    btn.className = `flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 shadow-md ${namaTab === 'tab-2024' ? 'bg-pkb text-white' : 'bg-blue-600 text-white'}`;
+                } else {
+                    btn.className = "flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 text-gray-500 hover:bg-gray-100";
+                }
+            });
         }
 
         const firebaseConfig = {
@@ -160,7 +162,6 @@
         let dataGlobal2029 = [];
         let myChartKecamatan = null;
         let myChartProgres = null;
-
         let levelSaatIni = 'KOTA'; 
         let kecPilihan = null;
         let kelPilihan = null;
@@ -172,49 +173,33 @@
 
         database.ref('agregat_wilayah_2024').on('value', (snapshot) => {
             dataAgregat = snapshot.val();
-            
-            document.getElementById('status-koneksi').innerText = "✅ ONLINE REAL-TIME";
+            document.getElementById('status-koneksi').innerText = "✅ SISTEM AKTIF";
             document.getElementById('status-koneksi').classList.replace("text-yellow-300", "text-green-300");
             document.getElementById('status-koneksi').classList.remove("animate-pulse");
 
             if (dataAgregat) {
-                let grandTotalSuara = 0;
-                let totalTPSMasuk = 0;
-                let rekapKecamatan = {};
-
+                let grandTotalSuara = 0, totalTPSMasuk = 0, rekapKecamatan = {};
                 for (let kec in dataAgregat) {
                     let suaraKec = dataAgregat[kec].total_suara;
                     grandTotalSuara += suaraKec;
                     rekapKecamatan[kec] = suaraKec;
-                    
                     for (let kel in dataAgregat[kec].kelurahan) {
                         totalTPSMasuk += Object.keys(dataAgregat[kec].kelurahan[kel].tps).length;
                     }
                 }
-
                 document.getElementById('teks-total-suara').innerText = new Intl.NumberFormat('id-ID').format(grandTotalSuara);
                 document.getElementById('teks-total-tps').innerText = new Intl.NumberFormat('id-ID').format(totalTPSMasuk);
-                
                 if (targetTPSMaster > 0) {
                     document.getElementById('target-tps-master').innerText = "/ " + new Intl.NumberFormat('id-ID').format(targetTPSMaster);
-                    let persentaseTPS = (totalTPSMasuk / targetTPSMaster) * 100;
-                    if(persentaseTPS > 100) persentaseTPS = 100;
-                    document.getElementById('bar-tps').style.width = persentaseTPS + '%';
+                    document.getElementById('bar-tps').style.width = Math.min((totalTPSMasuk / targetTPSMaster) * 100, 100) + '%';
                 }
-
                 renderTabelDrillDown();
-
                 let topKecamatan = Object.keys(rekapKecamatan).sort((a,b) => rekapKecamatan[b] - rekapKecamatan[a]).slice(0,5);
-                let nilaiKecamatan = topKecamatan.map(k => rekapKecamatan[k]);
-
                 const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
                 if(myChartKecamatan) myChartKecamatan.destroy();
                 myChartKecamatan = new Chart(ctxKec, {
                     type: 'bar',
-                    data: {
-                        labels: topKecamatan,
-                        datasets: [{ label: 'Total Suara', data: nilaiKecamatan, backgroundColor: '#03754c', borderRadius: 4 }]
-                    },
+                    data: { labels: topKecamatan, datasets: [{ label: 'Suara', data: topKecamatan.map(k => rekapKecamatan[k]), backgroundColor: '#03754c', borderRadius: 5 }] },
                     options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
             }
@@ -225,127 +210,107 @@
             if(level === 'KOTA') { kecPilihan = null; kelPilihan = null; }
             if(level === 'KECAMATAN') { kecPilihan = namaKec; kelPilihan = null; }
             if(level === 'KELURAHAN') { kecPilihan = namaKec; kelPilihan = namaKel; }
-            document.getElementById('cari-2024').value = '';
             renderTabelDrillDown();
         }
 
-        // ========================================================
-        // TABEL 2024: DIRUBAH JADI CARD VIEW UNTUK MOBILE
-        // ========================================================
+        // 🔥 TABEL INTEGRASI 2024 & 2029 
         function renderTabelDrillDown() {
             if(!dataAgregat) return;
-            
             const head = document.getElementById('tabel-head-2024');
             const body = document.getElementById('tabel-body-2024');
             const breadcrumb = document.getElementById('breadcrumb');
             let htmlBody = "";
 
             if (levelSaatIni === 'KOTA') {
-                breadcrumb.innerHTML = `<span class="cursor-pointer text-pkb hover:underline" onclick="navigasi('KOTA')">📍 KOTA SURABAYA</span>`;
-                head.innerHTML = `<tr><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Kecamatan</th><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Total Suara PKB</th><th class="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider">Aksi</th></tr>`;
+                breadcrumb.innerHTML = `<span class="cursor-pointer hover:underline" onclick="navigasi('KOTA')">📍 SURABAYA (KOTA)</span>`;
+                head.innerHTML = `<tr><th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Wilayah Kecamatan</th><th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">SUARA PKB 2024 vs Progres '29</th><th class="px-4 py-4 text-right text-xs font-bold uppercase tracking-wider">Opsi</th></tr>`;
                 
                 let arrKec = Object.keys(dataAgregat).sort((a,b) => dataAgregat[b].total_suara - dataAgregat[a].total_suara);
-                
                 arrKec.forEach(kec => {
+                    let d = dataAgregat[kec];
                     htmlBody += `
-                    <tr class="block md:table-row bg-white border border-gray-200 md:border-b md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 shadow-sm md:shadow-none hover:bg-green-50 transition-colors">
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex justify-between md:block items-center">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase">Kecamatan</span>
-                                <span class="text-sm font-bold text-gray-800">${kec}</span>
+                    <tr class="block md:table-row bg-white border border-gray-300 md:border-b md:border-x-0 md:border-t-0 rounded-xl md:rounded-none shadow-md md:shadow-none hover:bg-green-50 border-l-8 border-l-pkb md:border-l-0 mb-4 md:mb-0">
+                        <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase block mb-1">Nama Kecamatan</span>
+                            <span class="text-sm font-black text-gray-900 uppercase">${kec}</span>
+                        </td>
+                        <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase block mb-1">Pencapaian Suara & Rekrutmen</span>
+                            <div class="flex flex-col">
+                                <span class="text-lg md:text-base font-black text-pkb">${new Intl.NumberFormat('id-ID').format(d.total_suara)} <span class="text-[10px] text-gray-500 font-bold uppercase">Suara PKB 2024</span></span>
+                                <span class="text-sm font-black text-blue-600 mt-1 bg-blue-50 px-2 py-0.5 rounded w-max">+${new Intl.NumberFormat('id-ID').format(d.pemilih_baru || 0)} <span class="text-[10px] text-blue-500 uppercase">PEMILIH BARU</span></span>
                             </div>
                         </td>
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex justify-between md:block items-center">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase">Total Suara</span>
-                                <span class="text-sm font-black text-pkb">${new Intl.NumberFormat('id-ID').format(dataAgregat[kec].total_suara)}</span>
-                            </div>
-                        </td>
-                        <td class="block md:table-cell px-4 py-3 text-right bg-gray-50 md:bg-transparent rounded-b-lg md:rounded-none">
-                            <button onclick="navigasi('KECAMATAN', '${kec}')" class="w-full md:w-auto bg-white md:bg-gray-100 border border-gray-200 md:border-none hover:bg-pkb hover:text-white text-gray-700 px-4 py-2 md:px-3 md:py-1 rounded text-xs font-bold transition-colors shadow-sm md:shadow-none">Lihat Wilayah ➡️</button>
+                        <td class="block md:table-cell px-4 py-4 text-right bg-gray-50 md:bg-transparent rounded-b-xl md:rounded-none">
+                            <button onclick="navigasi('KECAMATAN', '${kec}')" class="w-full md:w-auto bg-gray-800 text-white px-4 py-2.5 rounded-lg text-xs font-black shadow-md hover:bg-pkb transition-all uppercase">Lihat Wilayah ➡️</button>
                         </td>
                     </tr>`;
                 });
             } 
             else if (levelSaatIni === 'KECAMATAN') {
-                breadcrumb.innerHTML = `
-                    <span class="cursor-pointer text-gray-400 hover:text-pkb" onclick="navigasi('KOTA')">📍 SURABAYA</span> 
-                    <span class="text-gray-400">/</span> 
-                    <span class="cursor-pointer text-pkb font-bold hover:underline" onclick="navigasi('KECAMATAN', '${kecPilihan}')">${kecPilihan}</span>
-                `;
-                head.innerHTML = `<tr><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Kelurahan</th><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Total Suara PKB</th><th class="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider">Aksi</th></tr>`;
+                breadcrumb.innerHTML = `<span class="opacity-50 cursor-pointer" onclick="navigasi('KOTA')">SURABAYA</span> <span class="mx-1">/</span> <span class="font-black uppercase">${kecPilihan}</span>`;
+                head.innerHTML = `<tr><th class="px-4 py-4 text-left text-xs font-bold uppercase text-white">Kelurahan</th><th class="px-4 py-4 text-left text-xs font-bold uppercase text-white">SUARA PKB 2024 vs Progres '29</th><th class="px-4 py-4 text-right text-xs font-bold uppercase text-white">Opsi</th></tr>`;
                 
-                let dataKelurahan = dataAgregat[kecPilihan].kelurahan;
-                let arrKel = Object.keys(dataKelurahan).sort((a,b) => dataKelurahan[b].total_suara - dataKelurahan[a].total_suara);
-
-                arrKel.forEach(kel => {
+                let dataKel = dataAgregat[kecPilihan].kelurahan;
+                Object.keys(dataKel).sort((a,b)=>dataKel[b].total_suara - dataKel[a].total_suara).forEach(kel => {
+                    let d = dataKel[kel];
                     htmlBody += `
-                    <tr class="block md:table-row bg-white border border-gray-200 md:border-b md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 shadow-sm md:shadow-none hover:bg-green-50 transition-colors">
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex justify-between md:block items-center">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase">Kelurahan</span>
-                                <span class="text-sm font-bold text-gray-800">${kel}</span>
+                    <tr class="block md:table-row bg-white border border-gray-300 md:border-b md:border-x-0 md:border-t-0 rounded-xl md:rounded-none shadow-md md:shadow-none hover:bg-green-50 border-l-8 border-l-pkb md:border-l-0 mb-4 md:mb-0">
+                        <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase block mb-1">Kelurahan</span>
+                            <span class="text-sm font-black text-gray-900 uppercase">${kel}</span>
+                        </td>
+                        <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase block mb-1">Pencapaian Suara & Rekrutmen</span>
+                            <div class="flex flex-col">
+                                <span class="text-lg md:text-base font-black text-pkb">${new Intl.NumberFormat('id-ID').format(d.total_suara)} <span class="text-[10px] text-gray-500 font-bold uppercase">Suara PKB 2024</span></span>
+                                <span class="text-sm font-black text-blue-600 mt-1 bg-blue-50 px-2 py-0.5 rounded w-max">+${new Intl.NumberFormat('id-ID').format(d.pemilih_baru || 0)} <span class="text-[10px] text-blue-500 uppercase">PEMILIH BARU</span></span>
                             </div>
                         </td>
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex justify-between md:block items-center">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase">Total Suara</span>
-                                <span class="text-sm font-black text-pkb">${new Intl.NumberFormat('id-ID').format(dataKelurahan[kel].total_suara)}</span>
-                            </div>
-                        </td>
-                        <td class="block md:table-cell px-4 py-3 text-right bg-gray-50 md:bg-transparent rounded-b-lg md:rounded-none">
-                            <button onclick="navigasi('KELURAHAN', '${kecPilihan}', '${kel}')" class="w-full md:w-auto bg-white md:bg-gray-100 border border-gray-200 md:border-none hover:bg-pkb hover:text-white text-gray-700 px-4 py-2 md:px-3 md:py-1 rounded text-xs font-bold transition-colors shadow-sm md:shadow-none">Lihat TPS ➡️</button>
+                        <td class="block md:table-cell px-4 py-4 text-right bg-gray-50 md:bg-transparent rounded-b-xl md:rounded-none">
+                            <button onclick="navigasi('KELURAHAN', '${kecPilihan}', '${kel}')" class="w-full md:w-auto bg-gray-800 text-white px-4 py-2.5 rounded-lg text-xs font-black shadow-md hover:bg-pkb transition-all uppercase">Lihat TPS ➡️</button>
                         </td>
                     </tr>`;
                 });
             }
             else if (levelSaatIni === 'KELURAHAN') {
-                breadcrumb.innerHTML = `
-                    <span class="cursor-pointer text-gray-400 hover:text-pkb" onclick="navigasi('KOTA')">📍 SURABAYA</span> 
-                    <span class="text-gray-400">/</span> 
-                    <span class="cursor-pointer text-gray-400 hover:text-pkb" onclick="navigasi('KECAMATAN', '${kecPilihan}')">${kecPilihan}</span>
-                    <span class="text-gray-400">/</span> 
-                    <span class="text-pkb font-bold">${kelPilihan}</span>
-                `;
-                head.innerHTML = `<tr><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">TPS & Lokasi Fisik</th><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Suara Partai</th><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Caleg Dominan</th><th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Total Suara PKB</th></tr>`;
+                breadcrumb.innerHTML = `<span class="opacity-50 cursor-pointer" onclick="navigasi('KOTA')">SURABAYA</span> <span class="mx-1">/</span> <span class="opacity-50 cursor-pointer" onclick="navigasi('KECAMATAN', '${kecPilihan}')">${kecPilihan}</span> <span class="mx-1">/</span> <span class="font-black uppercase">${kelPilihan}</span>`;
+                
+                // 🔥 KUNCI PERBAIKAN: Header dihilangkan total agar struktur grid kartu tidak tergencet tabel!
+                head.innerHTML = ``; 
                 
                 let dataTPS = dataAgregat[kecPilihan].kelurahan[kelPilihan].tps;
-                let arrTPS = Object.keys(dataTPS).sort((a,b) => parseInt(a) - parseInt(b));
-
-                arrTPS.forEach(tps => {
+                Object.keys(dataTPS).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(tps => {
                     let d = dataTPS[tps];
-                    let namaPemenang = d.pemenang !== "-" ? d.pemenang.replace(/_/g, '.') : "-";
-                    
+                    // 🔥 KUNCI PERBAIKAN: Kartu dibungkus di dalam struktur <tr> dan <td> khusus layar penuh
                     htmlBody += `
-                    <tr class="block md:table-row bg-white border border-gray-200 md:border-b md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 shadow-sm md:shadow-none hover:bg-green-50 transition-colors">
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex flex-col md:block">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase mb-1">Nomor TPS & Alamat</span>
-                                <div>
-                                    <span class="bg-gray-100 border text-gray-700 px-2 py-1 rounded font-bold text-xs inline-block mb-1">TPS ${tps}</span>
-                                    <span class="block text-[11px] text-gray-600 leading-snug">📍 ${d.alamat || "-"}</span>
+                    <tr class="block w-full">
+                        <td class="block w-full p-0 border-none">
+                            <div class="bg-white border border-gray-300 border-l-8 border-l-pkb rounded-xl shadow-md mb-5 md:mb-6 p-4 md:p-6 hover:shadow-lg transition-all mx-1 md:mx-0">
+                                <div class="flex justify-between items-start border-b border-gray-200 pb-3 mb-3 md:mb-4">
+                                    <span class="bg-gray-900 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-md font-black text-sm md:text-base uppercase shadow-sm">TPS ${tps}</span>
+                                    <div class="text-right">
+                                        <p class="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest">Total Suara 2024</p>
+                                        <p class="text-2xl md:text-3xl font-black text-pkb">${d.total_suara} <span class="text-xs md:text-sm text-gray-400">suara</span></p>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex justify-between md:block items-center">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase">Suara Coblos Partai</span>
-                                <span class="text-sm font-bold text-yellow-600">${d.suara_partai}</span>
-                            </div>
-                        </td>
-                        <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                            <div class="flex justify-between md:block items-center text-right md:text-left">
-                                <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase">Caleg Tertinggi</span>
-                                <div>
-                                    <b class="text-sm text-gray-800">${namaPemenang}</b><br>
-                                    <span class="text-xs font-semibold text-gray-500">(${d.max_suara} Suara)</span>
+                                <p class="text-xs md:text-sm text-gray-700 font-bold flex items-start leading-snug mb-4 bg-green-50/50 p-3 md:p-4 rounded-lg border border-green-100">
+                                    <span class="mr-2 text-lg md:text-xl">📍</span> ${d.alamat || "Alamat tidak tersedia"}
+                                </p>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                                    <div class="bg-blue-50 p-3 md:p-4 rounded-lg border border-blue-300 shadow-inner md:col-span-1 col-span-2 flex flex-col justify-center">
+                                        <p class="text-[10px] md:text-xs font-black text-blue-700 uppercase mb-1">🔥 PROGRES REKRUTMEN</p>
+                                        <p class="text-xl md:text-2xl font-black text-blue-900">+${d.pemilih_baru || 0} <span class="text-xs md:text-sm font-bold text-blue-600">Orang Baru</span></p>
+                                    </div>
+                                    <div class="bg-yellow-50 p-3 md:p-4 rounded-lg border border-yellow-200 shadow-inner flex flex-col justify-center">
+                                        <p class="text-[10px] md:text-xs font-black text-yellow-700 uppercase mb-1">Suara Partai</p>
+                                        <p class="text-lg md:text-xl font-black text-gray-800">${d.suara_partai}</p>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200 shadow-inner flex flex-col justify-center">
+                                        <p class="text-[10px] md:text-xs font-black text-gray-500 uppercase mb-1">Caleg Pemenang</p>
+                                        <p class="text-[11px] md:text-sm font-black text-gray-800 leading-tight">${d.pemenang.replace(/_/g,' ')} <span class="block text-[9px] md:text-xs text-gray-500 mt-1">(${d.max_suara} suara)</span></p>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="block md:table-cell px-4 py-3 bg-green-50/50 md:bg-transparent rounded-b-lg md:rounded-none">
-                            <div class="flex justify-between md:block items-center">
-                                <span class="md:hidden text-[10px] font-bold text-pkb uppercase">TOTAL SUARA (PKB)</span>
-                                <span class="text-base md:text-sm font-black text-pkb">${d.total_suara}</span>
                             </div>
                         </td>
                     </tr>`;
@@ -357,98 +322,83 @@
         function filterTabelDrillDown() {
             let input = document.getElementById("cari-2024").value.toUpperCase();
             let table = document.getElementById("tabel-body-2024");
-            let tr = table.getElementsByTagName("tr");
-
-            for (let i = 0; i < tr.length; i++) {
-                let td = tr[i].getElementsByTagName("td");
-                let match = false;
-                for(let j = 0; j < td.length; j++){
-                    if (td[j]) {
-                        if (td[j].innerHTML.toUpperCase().indexOf(input) > -1) {
-                            match = true;
-                            break;
-                        }
-                    }
-                }
-                tr[i].style.display = match ? "" : "none";
+            let items = table.children;
+            for (let i = 0; i < items.length; i++) {
+                items[i].style.display = items[i].innerText.toUpperCase().includes(input) ? "" : "none";
             }
         }
 
         database.ref('pemilih_baru_2029').on('value', (snapshot) => {
             const data = snapshot.val();
             dataGlobal2029 = [];
-            let totalPemilih = 0;
-            const targetPemilih = 500000;
-
             if (data) {
-                for (let key in data) { totalPemilih++; dataGlobal2029.push(data[key]); }
+                for (let key in data) { dataGlobal2029.push(data[key]); }
                 dataGlobal2029.reverse();
-                document.getElementById('teks-pemilih-baru').innerText = new Intl.NumberFormat('id-ID').format(totalPemilih);
-                renderTabel2029(dataGlobal2029.slice(0, 50));
+                document.getElementById('teks-pemilih-baru').innerText = new Intl.NumberFormat('id-ID').format(dataGlobal2029.length);
+                renderTabel2029(dataGlobal2029.slice(0, 100));
+                
+                const target = 500000;
+                document.getElementById('persen-target').innerText = ((dataGlobal2029.length/target)*100).toFixed(2) + "%";
+                const ctxProg = document.getElementById('chartProgres').getContext('2d');
+                if(myChartProgres) myChartProgres.destroy();
+                myChartProgres = new Chart(ctxProg, {
+                    type: 'doughnut',
+                    data: { labels: ['Input', 'Sisa'], datasets: [{ data: [dataGlobal2029.length, target-dataGlobal2029.length], backgroundColor: ['#3b82f6', '#f3f4f6'], borderWidth: 0 }] },
+                    options: { maintainAspectRatio: false, cutout: '80%' }
+                });
             }
-
-            let sisaTarget = targetPemilih - totalPemilih;
-            if (sisaTarget < 0) sisaTarget = 0;
-            document.getElementById('persen-target').innerText = ((totalPemilih / targetPemilih) * 100).toFixed(2) + "%";
-
-            const ctxProg = document.getElementById('chartProgres').getContext('2d');
-            if(myChartProgres) myChartProgres.destroy();
-            myChartProgres = new Chart(ctxProg, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Telah Terdata', 'Sisa Target'],
-                    datasets: [{ data: [totalPemilih, sisaTarget], backgroundColor: ['#3b82f6', '#e5e7eb'], borderWidth: 0, hoverOffset: 4 }]
-                },
-                options: { maintainAspectRatio: false, cutout: '75%' }
-            });
         });
 
-        // ========================================================
-        // TABEL 2029: DIRUBAH JADI CARD VIEW UNTUK MOBILE
-        // ========================================================
+        // 🔥 TABEL AUDIT PEMILIH BARU
         function renderTabel2029(arrayData) {
             let html = "";
             arrayData.forEach(d => {
+                let isDanger = d.status.indexOf("🚨") > -1;
                 let isWarning = d.status.indexOf("⚠️") > -1;
-                let rowColor = isWarning ? "bg-yellow-50" : "bg-white md:hover:bg-blue-50";
-                let statusBadge = isWarning ? `<span class="bg-yellow-200 text-yellow-800 text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap inline-block">${d.status}</span>` : `<span class="bg-green-100 text-green-800 text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap inline-block">${d.status}</span>`;
+                let isLoyal = d.status.indexOf("⭐") > -1;
                 
+                let bgColor = isDanger ? 'bg-red-50' : (isWarning ? 'bg-yellow-50' : (isLoyal ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'));
+                let borderColor = isDanger ? 'border-l-red-600 border-red-300' : (isWarning ? 'border-l-yellow-500 border-yellow-300' : (isLoyal ? 'border-l-blue-600 border-blue-300' : 'border-l-green-500 border-gray-300'));
+                let badgeClass = isDanger ? 'bg-red-200 text-red-800 border border-red-400' : (isWarning ? 'bg-yellow-200 text-yellow-800 border border-yellow-400' : (isLoyal ? 'bg-blue-200 text-blue-800 border border-blue-400' : 'bg-green-200 text-green-800 border border-green-400'));
+
                 html += `
-                <tr class="${rowColor} block md:table-row border border-gray-200 md:border-b md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 shadow-sm md:shadow-none transition-colors">
-                    <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                        <div class="flex justify-between md:block items-center">
-                            <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase tracking-wider">Identitas Pemilih</span>
-                            <div class="text-right md:text-left">
-                                <b class="text-sm text-gray-900">${d.nama}</b><br>
-                                <span class="text-xs text-gray-500 font-medium">NIK: ${d.nik}</span>
+                <tr class="block md:table-row ${bgColor} border ${borderColor} border-l-8 md:border-b md:border-x-0 md:border-t-0 md:border-l-0 rounded-xl mb-5 shadow-md md:shadow-none transition-all">
+                    <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200">
+                        <div class="flex justify-between items-start md:block">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase tracking-widest w-1/3">Identitas</span>
+                            <div class="text-right md:text-left w-2/3 md:w-full">
+                                <b class="text-sm text-gray-900 block uppercase leading-tight">${d.nama}</b>
+                                <span class="text-[11px] text-gray-600 font-mono font-bold tracking-tight bg-white px-1 py-0.5 rounded border border-gray-200 mt-1 inline-block">NIK: ${d.nik}</span>
                             </div>
                         </div>
                     </td>
-                    <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                        <div class="flex justify-between md:block items-center">
-                            <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase tracking-wider">Wilayah</span>
-                            <div class="text-right md:text-left">
-                                <b class="text-sm text-gray-800">${d.kelurahan}</b><br>
-                                <span class="text-xs text-gray-600">RT ${d.rt} / RW ${d.rw}</span>
+                    <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200">
+                        <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase tracking-widest w-1/3">Domisili</span>
+                            <div class="text-right md:text-left w-2/3 md:w-full">
+                                <b class="text-xs text-gray-800 block uppercase">${d.kelurahan}</b>
+                                <span class="text-[11px] text-gray-600 font-bold uppercase">RT ${d.rt} / RW ${d.rw}</span>
                             </div>
                         </div>
                     </td>
-                    <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100 bg-blue-50/30 md:bg-transparent">
+                    <td class="block md:table-cell px-4 py-4 border-b md:border-none border-gray-200 bg-white/50 md:bg-transparent">
+                        <div class="flex flex-col">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Titik TPS</span>
+                            <div class="text-[11px] font-black text-gray-800 leading-snug">${d.prediksi_tps}</div>
+                        </div>
+                    </td>
+                    <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-200">
+                        <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase tracking-widest">Koordinator</span>
+                            <span class="text-[11px] font-black text-gray-800 bg-white border border-gray-300 px-2 py-1 rounded shadow-sm">${d.koordinator}</span>
+                        </div>
+                    </td>
+                    <td class="block md:table-cell px-4 py-4 bg-white/40 md:bg-transparent rounded-b-xl">
                         <div class="flex flex-col md:block">
-                            <span class="md:hidden text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Prediksi TPS & Lokasi Fisik</span>
-                            <div class="text-sm font-bold text-blue-700 leading-snug">${d.prediksi_tps}</div>
-                        </div>
-                    </td>
-                    <td class="block md:table-cell px-4 py-3 border-b md:border-none border-gray-100">
-                        <div class="flex justify-between md:block items-center">
-                            <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase tracking-wider">Koordinator</span>
-                            <div class="text-right md:text-left text-sm text-gray-700">${d.koordinator}</div>
-                        </div>
-                    </td>
-                    <td class="block md:table-cell px-4 py-3 bg-gray-50 md:bg-transparent rounded-b-lg md:rounded-none">
-                        <div class="flex justify-between md:block items-center">
-                            <span class="md:hidden text-[10px] font-bold text-gray-500 uppercase tracking-wider">Status Input</span>
-                            <div class="text-right md:text-left">${statusBadge}</div>
+                            <span class="md:hidden text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Status Audit</span>
+                            <span class="px-3 py-2 rounded-lg font-black text-[10px] shadow-sm leading-tight inline-block ${badgeClass}">
+                                ${d.status}
+                            </span>
                         </div>
                     </td>
                 </tr>`;
@@ -458,7 +408,7 @@
 
         function filterTabel2029() { 
             let k = document.getElementById('cari-2029').value.toUpperCase(); 
-            renderTabel2029(k === "" ? dataGlobal2029.slice(0, 50) : dataGlobal2029.filter(d => d.nama.toUpperCase().includes(k) || d.kelurahan.toUpperCase().includes(k)).slice(0, 50)); 
+            renderTabel2029(k === "" ? dataGlobal2029.slice(0, 100) : dataGlobal2029.filter(d => d.nama.toUpperCase().includes(k) || d.kelurahan.toUpperCase().includes(k)).slice(0, 100)); 
         }
     </script>
 </body>
