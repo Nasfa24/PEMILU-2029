@@ -276,13 +276,11 @@
             else if (levelSaatIni === 'KELURAHAN') {
                 breadcrumb.innerHTML = `<span class="opacity-50 cursor-pointer" onclick="navigasi('KOTA')">SURABAYA</span> <span class="mx-1">/</span> <span class="opacity-50 cursor-pointer" onclick="navigasi('KECAMATAN', '${kecPilihan}')">${kecPilihan}</span> <span class="mx-1">/</span> <span class="font-black uppercase">${kelPilihan}</span>`;
                 
-                // 🔥 KUNCI PERBAIKAN: Header dihilangkan total agar struktur grid kartu tidak tergencet tabel!
                 head.innerHTML = ``; 
                 
                 let dataTPS = dataAgregat[kecPilihan].kelurahan[kelPilihan].tps;
                 Object.keys(dataTPS).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(tps => {
                     let d = dataTPS[tps];
-                    // 🔥 KUNCI PERBAIKAN: Kartu dibungkus di dalam struktur <tr> dan <td> khusus layar penuh
                     htmlBody += `
                     <tr class="block w-full">
                         <td class="block w-full p-0 border-none">
