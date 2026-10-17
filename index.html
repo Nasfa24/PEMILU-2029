@@ -78,6 +78,7 @@
         <div class="flex space-x-2 mb-4 bg-white p-1 rounded-xl shadow-md border border-gray-300 overflow-x-auto scrollbar-hide">
             <button onclick="bukaTab('tab-2024')" id="btn-2024" class="flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 bg-pkb text-white shadow-md">📊 PETA KEKUATAN & PROGRES</button>
             <button onclick="bukaTab('tab-2029')" id="btn-2029" class="flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 text-gray-500 hover:bg-gray-100">👥 DATA PEMILIH BARU</button>
+            <button onclick="bukaTab('tab-ktp')" id="btn-ktp" class="flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 text-gray-500 hover:bg-gray-100">📋 DATA KTP</button>
         </div>
 
         <div id="tab-2024" class="block animate-in fade-in duration-500">
@@ -137,12 +138,80 @@
                 </div>
             </div>
         </div>
+    
+        <div id="tab-ktp" class="hidden animate-in fade-in duration-500">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-purple-600">
+                    <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">Total KTP Terinput</h3>
+                    <p id="ktp-total" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-indigo-500">
+                    <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">Koordinator Unik</h3>
+                    <p id="ktp-koordinator" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-cyan-500">
+                    <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">Kecamatan Tercover</h3>
+                    <p id="ktp-kecamatan" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 border-t-4 border-t-pink-500">
+                    <h3 class="text-gray-500 text-[10px] md:text-xs font-bold uppercase">KTP Dgn No HP</h3>
+                    <p id="ktp-dgn-hp" class="text-xl md:text-3xl font-black text-gray-800 mt-1">0</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 md:p-6">
+                    <h2 class="text-sm font-black text-gray-800 mb-4 uppercase flex items-center"><span class="w-2 h-4 bg-purple-600 mr-2 rounded-sm"></span>Distribusi Per Koordinator</h2>
+                    <div class="relative h-64 md:h-80"><canvas id="chartKoordinatorKTP"></canvas></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-gray-300 p-4 md:p-6">
+                    <h2 class="text-sm font-black text-gray-800 mb-4 uppercase flex items-center"><span class="w-2 h-4 bg-cyan-500 mr-2 rounded-sm"></span>Top 10 Kecamatan (KTP)</h2>
+                    <div class="relative h-64 md:h-80"><canvas id="chartKecamatanKTP"></canvas></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-300 overflow-hidden">
+                <div class="p-4 bg-gray-100 border-b border-gray-300 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                    <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                        <select id="filter-kec-ktp" onchange="renderTabelKTP()" class="px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-bold">
+                            <option value="">Semua Kecamatan</option>
+                        </select>
+                        <select id="filter-keg-ktp" onchange="renderTabelKTP()" class="px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-bold">
+                            <option value="">Semua Kegiatan</option>
+                        </select>
+                    </div>
+                    <input type="text" id="search-ktp" oninput="renderTabelKTP()" placeholder="Cari NIK / Nama / Alamat..." class="px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 w-full md:w-72 text-sm font-bold">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-purple-600 text-white">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">NIK</th>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">Nama</th>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">No HP</th>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">Alamat</th>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">Kel/Kec</th>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">Kegiatan</th>
+                                <th class="px-3 py-3 text-left text-xs font-black uppercase">Koordinator</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-body-ktp">
+                            <tr><td colspan="7" class="p-10 text-center text-gray-500 font-bold">Memuat data KTP...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 bg-gray-50 border-t border-gray-300 text-xs font-bold text-gray-600">
+                    Menampilkan <span id="ktp-shown">0</span> dari <span id="ktp-total-tabel">0</span> data
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
         function bukaTab(namaTab) {
-            const tabs = ['tab-2024', 'tab-2029'];
-            const buttons = ['btn-2024', 'btn-2029'];
+            const tabs = ['tab-2024', 'tab-2029', 'tab-ktp'];
+            const buttons = ['btn-2024', 'btn-2029', 'btn-ktp'];
             
             tabs.forEach(t => document.getElementById(t).classList.add('hidden'));
             document.getElementById(namaTab).classList.remove('hidden');
@@ -150,7 +219,10 @@
             buttons.forEach(b => {
                 const btn = document.getElementById(b);
                 if(b.includes(namaTab.split('-')[1])) {
-                    btn.className = `flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 shadow-md ${namaTab === 'tab-2024' ? 'bg-pkb text-white' : 'bg-blue-600 text-white'}`;
+                    const activeClass = namaTab === 'tab-2024' ? 'bg-pkb text-white' : namaTab === 'tab-2029' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white';
+                    const inactiveClass = 'text-gray-500 hover:bg-gray-100';
+                    const isActive = id === 'btn-' + namaTab.replace('tab-', '');
+                    btn.className = `flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 shadow-md ${isActive ? activeClass : inactiveClass}`;
                 } else {
                     btn.className = "flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 text-gray-500 hover:bg-gray-100";
                 }
@@ -497,6 +569,198 @@
             }
             document.getElementById('tabel-body-2029').innerHTML = html;
         }
+    
+        // ============================================
+        // INTEGRASI DATA KTP DARI SUPABASE
+        // ============================================
+        const SUPABASE_URL_KTP = 'https://hvbrskchlpemypawpqjn.supabase.co/rest/v1';
+        const SUPABASE_KEY_KTP = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo';
+        let dataKTP = [];
+        let chartKoordinatorKTP = null;
+        let chartKecamatanKTP = null;
+        let dataKTPLoaded = false;
+
+        async function loadDataKTP() {
+            if (dataKTPLoaded) return;
+            try {
+                const url = SUPABASE_URL_KTP + '/data_ktp?select=nik_pemilih,nama_pemilih,no_hp,alamat,rt,rw,kelurahan,kecamatan,nama_kegiatan,koordinator_form,keterangan&limit=5000';
+                const res = await fetch(url, {
+                    headers: {
+                        'apikey': SUPABASE_KEY_KTP,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY_KTP
+                    }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                dataKTP = await res.json();
+                dataKTPLoaded = true;
+                renderSemuaKTP();
+            } catch (e) {
+                console.error('Gagal load data KTP:', e);
+                document.getElementById('tabel-body-ktp').innerHTML = '<tr><td colspan="7" class="p-10 text-center text-red-500 font-bold">Gagal memuat data: ' + e.message + '</td></tr>';
+            }
+        }
+
+        function renderSemuaKTP() {
+            renderStatKTP();
+            renderChartKoordinatorKTP();
+            renderChartKecamatanKTP();
+            isiFilterKTP();
+            renderTabelKTP();
+        }
+
+        function renderStatKTP() {
+            const total = dataKTP.length;
+            const setKoor = new Set();
+            const setKec = new Set();
+            let adaHP = 0;
+            dataKTP.forEach(function (d) {
+                if (d.koordinator_form && d.koordinator_form.trim() !== '') setKoor.add(d.koordinator_form.trim());
+                if (d.kecamatan && d.kecamatan.trim() !== '') setKec.add(d.kecamatan.trim());
+                if (d.no_hp && String(d.no_hp).trim() !== '') adaHP++;
+            });
+            document.getElementById('ktp-total').innerText = total.toLocaleString('id-ID');
+            document.getElementById('ktp-koordinator').innerText = setKoor.size.toLocaleString('id-ID');
+            document.getElementById('ktp-kecamatan').innerText = setKec.size.toLocaleString('id-ID');
+            document.getElementById('ktp-dgn-hp').innerText = adaHP.toLocaleString('id-ID');
+        }
+
+        function renderChartKoordinatorKTP() {
+            const mapKoor = {};
+            dataKTP.forEach(function (d) {
+                let k = (d.koordinator_form || 'Kosong').trim() || 'Kosong';
+                mapKoor[k] = (mapKoor[k] || 0) + 1;
+            });
+            const sorted = Object.entries(mapKoor).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 10);
+            const labels = sorted.map(function (x) { return x[0]; });
+            const values = sorted.map(function (x) { return x[1]; });
+
+            const ctx = document.getElementById('chartKoordinatorKTP').getContext('2d');
+            if (chartKoordinatorKTP) chartKoordinatorKTP.destroy();
+            chartKoordinatorKTP = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah KTP',
+                        data: values,
+                        backgroundColor: '#9333ea',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { font: { weight: 'bold' } } }, y: { ticks: { font: { weight: 'bold', size: 11 } } } }
+                }
+            });
+        }
+
+        function renderChartKecamatanKTP() {
+            const mapKec = {};
+            dataKTP.forEach(function (d) {
+                let k = (d.kecamatan || 'Tidak Diketahui').trim() || 'Tidak Diketahui';
+                mapKec[k] = (mapKec[k] || 0) + 1;
+            });
+            const sorted = Object.entries(mapKec).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 10);
+            const labels = sorted.map(function (x) { return x[0]; });
+            const values = sorted.map(function (x) { return x[1]; });
+
+            const ctx = document.getElementById('chartKecamatanKTP').getContext('2d');
+            if (chartKecamatanKTP) chartKecamatanKTP.destroy();
+            chartKecamatanKTP = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah KTP',
+                        data: values,
+                        backgroundColor: '#06b6d4',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { font: { weight: 'bold' } } }, y: { ticks: { font: { weight: 'bold', size: 11 } } } }
+                }
+            });
+        }
+
+        function isiFilterKTP() {
+            const setKec = new Set();
+            const setKeg = new Set();
+            dataKTP.forEach(function (d) {
+                if (d.kecamatan && d.kecamatan.trim()) setKec.add(d.kecamatan.trim());
+                if (d.nama_kegiatan && d.nama_kegiatan.trim()) setKeg.add(d.nama_kegiatan.trim());
+            });
+            const selKec = document.getElementById('filter-kec-ktp');
+            const selKeg = document.getElementById('filter-keg-ktp');
+            const valKec = selKec.value;
+            const valKeg = selKeg.value;
+            selKec.innerHTML = '<option value="">Semua Kecamatan</option>';
+            Array.from(setKec).sort().forEach(function (k) {
+                selKec.innerHTML += '<option value="' + k + '">' + k + '</option>';
+            });
+            selKeg.innerHTML = '<option value="">Semua Kegiatan</option>';
+            Array.from(setKeg).sort().forEach(function (k) {
+                selKeg.innerHTML += '<option value="' + k + '">' + k + '</option>';
+            });
+            selKec.value = valKec;
+            selKeg.value = valKeg;
+        }
+
+        function renderTabelKTP() {
+            const q = (document.getElementById('search-ktp').value || '').toLowerCase().trim();
+            const fKec = document.getElementById('filter-kec-ktp').value;
+            const fKeg = document.getElementById('filter-keg-ktp').value;
+
+            const filtered = dataKTP.filter(function (d) {
+                if (fKec && (d.kecamatan || '').trim() !== fKec) return false;
+                if (fKeg && (d.nama_kegiatan || '').trim() !== fKeg) return false;
+                if (q) {
+                    const blob = ((d.nik_pemilih || '') + ' ' + (d.nama_pemilih || '') + ' ' + (d.alamat || '')).toLowerCase();
+                    if (blob.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('ktp-total-tabel').innerText = filtered.length.toLocaleString('id-ID');
+            const shown = filtered.slice(0, 200);
+            document.getElementById('ktp-shown').innerText = shown.length.toLocaleString('id-ID');
+
+            if (shown.length === 0) {
+                document.getElementById('tabel-body-ktp').innerHTML = '<tr><td colspan="7" class="p-10 text-center text-gray-500 font-bold">Tidak ada data yang cocok.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            shown.forEach(function (d) {
+                html += '<tr class="border-b border-gray-200 hover:bg-purple-50">';
+                html += '<td class="px-3 py-3 text-xs font-mono font-bold text-gray-800">' + (d.nik_pemilih || '-') + '</td>';
+                html += '<td class="px-3 py-3 text-xs font-black text-gray-800">' + (d.nama_pemilih || '-') + '</td>';
+                html += '<td class="px-3 py-3 text-xs font-bold text-blue-700">' + (d.no_hp || '-') + '</td>';
+                html += '<td class="px-3 py-3 text-xs text-gray-700">' + (d.alamat || '-') + ' RT ' + (d.rt || '-') + '/RW ' + (d.rw || '-') + '</td>';
+                html += '<td class="px-3 py-3 text-xs font-bold text-gray-700">' + (d.kelurahan || '-') + ' / ' + (d.kecamatan || '-') + '</td>';
+                html += '<td class="px-3 py-3 text-xs"><span class="px-2 py-1 bg-yellow-200 text-yellow-900 rounded font-bold">' + (d.nama_kegiatan || '-') + '</span></td>';
+                html += '<td class="px-3 py-3 text-xs font-bold text-purple-700">' + (d.koordinator_form || '-') + '</td>';
+                html += '</tr>';
+            });
+            document.getElementById('tabel-body-ktp').innerHTML = html;
+        }
+
+        // Auto load saat tab KTP dibuka
+        const _originalBukaTab = bukaTab;
+        bukaTab = function (namaTab) {
+            _originalBukaTab(namaTab);
+            if (namaTab === 'tab-ktp') {
+                loadDataKTP();
+            }
+        };
+
     </script>
 </body>
 </html>
