@@ -219,10 +219,7 @@
             buttons.forEach(b => {
                 const btn = document.getElementById(b);
                 if(b.includes(namaTab.split('-')[1])) {
-                    const activeClass = namaTab === 'tab-2024' ? 'bg-pkb text-white' : namaTab === 'tab-2029' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white';
-                    const inactiveClass = 'text-gray-500 hover:bg-gray-100';
-                    const isActive = id === 'btn-' + namaTab.replace('tab-', '');
-                    btn.className = `flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 shadow-md ${isActive ? activeClass : inactiveClass}`;
+                                                                                btn.className = `flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 shadow-md ${namaTab === 'tab-2024' ? 'bg-pkb text-white' : namaTab === 'tab-2029' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white'}`;
                 } else {
                     btn.className = "flex-1 px-4 py-3 rounded-lg font-black text-xs md:text-sm transition-all duration-300 text-gray-500 hover:bg-gray-100";
                 }
